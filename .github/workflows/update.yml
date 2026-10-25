@@ -1,0 +1,42 @@
+name: עדכון מחיר PFAD
+
+on:
+  schedule:
+    # שעות UTC. ישראל בקיץ = UTC+3, בחורף = UTC+2.
+    # כל שעה עגולה בין 04:00 ל-16:00 UTC (07:00–19:00 בישראל) — מכסה את
+    # דוח אמצע היום ואת דוח הסגירה במלזיה, כך שמחיר חדש עולה תוך כשעה.
+    - cron: "5 4-16 * * 0-5"
+  workflow_dispatch:          # מאפשר גם הרצה ידנית מלשונית Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pfad-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: משיכת המחיר האחרון
+        id: scrape
+        run: python scripts/update.py
+
+      - name: שמירה במאגר
+        run: |
+          if git diff --quiet -- data.csv; then
+            echo "אין שינוי בקובץ הנתונים"
+            exit 0
+          fi
+          git config user.name  "pfad-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.csv
+          git commit -m "עדכון מחיר PFAD ($(date -u +%Y-%m-%d))"
+          git push
