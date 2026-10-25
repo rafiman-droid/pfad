@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="מחיר PFAD יומי, ממוצעים והשוואה רב-שנתית. מקור: agropost.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%9B%A2</text></svg>">
+<title>מחירון PFAD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f4f2ec; --surface:#fffdf7; --sunken:#efece3;
+  --ink:#17150f; --ink-2:#57534a; --muted:#8b8578;
+  --rule:#e2ded1; --rule-strong:#cfcabb;
+  --accent:#a8620d;
+  --up:#c0392f; --down:#0a7d2e;
+  --s2026:#2a78d6; --s2025:#eb6834; --s2024:#1baf7a;
+  --shadow:0 1px 2px rgba(23,21,15,.05), 0 8px 24px -18px rgba(23,21,15,.35);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#121210; --surface:#1c1b17; --sunken:#181713;
+    --ink:#f7f5ee; --ink-2:#c2beb1; --muted:#8b8578;
+    --rule:#2d2b24; --rule-strong:#3d3a31;
+    --accent:#e0973c;
+    --up:#e06a60; --down:#3fb264;
+    --s2026:#3987e5; --s2025:#d95926; --s2024:#199e70;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#121210; --surface:#1c1b17; --sunken:#181713;
+  --ink:#f7f5ee; --ink-2:#c2beb1; --muted:#8b8578;
+  --rule:#2d2b24; --rule-strong:#3d3a31;
+  --accent:#e0973c;
+  --up:#e06a60; --down:#3fb264;
+  --s2026:#3987e5; --s2025:#d95926; --s2024:#199e70;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Heebo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:15px; line-height:1.55; direction:rtl;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px; margin:0 auto; padding:32px 20px 64px; display:flex; flex-direction:column; gap:28px}
+
+/* ---------- header ---------- */
+.head{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px;
+  border-bottom:2px solid var(--ink); padding-bottom:14px}
+.head h1{
+  font-family:"Frank Ruhl Libre", Georgia, serif; font-weight:700;
+  font-size:clamp(28px,4.4vw,40px); line-height:1.1; margin:0; letter-spacing:-.01em;
+}
+.head h1 span{color:var(--accent)}
+.head .sub{margin:6px 0 0; color:var(--ink-2); font-size:14px; max-width:52ch}
+.stamp{text-align:left; font-size:12.5px; color:var(--muted); letter-spacing:.02em}
+.stamp b{display:block; color:var(--ink-2); font-weight:500; font-size:13px;
+  font-family:"IBM Plex Mono", ui-monospace, monospace; unicode-bidi:plaintext}
+
+/* ---------- hero ---------- */
+.today{display:grid; grid-template-columns:1.15fr 1fr; gap:1px; background:var(--rule);
+  border:1px solid var(--rule); border-radius:3px; overflow:hidden; box-shadow:var(--shadow)}
+.q{background:var(--surface); padding:22px 24px 20px; display:flex; flex-direction:column; gap:2px}
+.q .lbl{font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:500}
+.q .per{font-size:13px; color:var(--ink-2); margin-bottom:6px}
+.q .val{font-family:"IBM Plex Mono", ui-monospace, monospace; font-weight:500; direction:ltr;
+  font-size:clamp(38px,6.6vw,58px); line-height:1; letter-spacing:-.02em;
+  display:flex; align-items:baseline; gap:8px; justify-content:flex-start}
+.q .val em{font-style:normal; font-size:15px; color:var(--muted); font-family:"Heebo",sans-serif; letter-spacing:0}
+.q.sec .val{font-size:clamp(26px,4vw,34px); color:var(--ink-2)}
+.delta{margin-top:10px; display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:500}
+.delta .arrow{font-family:"IBM Plex Mono",monospace}
+.delta.up{color:var(--up)} .delta.down{color:var(--down)} .delta.flat{color:var(--muted)}
+.delta .since{color:var(--muted); font-weight:400}
+
+/* ---------- stats ---------- */
+.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+.stat{background:var(--surface); border:1px solid var(--rule); border-radius:3px; padding:14px 16px 15px}
+.stat .lbl{font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:500}
+.stat .v{font-family:"IBM Plex Mono",monospace; font-size:25px; font-weight:500; margin-top:4px;
+  letter-spacing:-.01em; direction:ltr; text-align:right}
+.stat .n{font-size:12.5px; color:var(--muted)}
+
+/* ---------- section ---------- */
+.sec{display:flex; flex-direction:column; gap:12px}
+.sec-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  border-bottom:1px solid var(--rule-strong); padding-bottom:7px}
+.sec-head h2{font-family:"Frank Ruhl Libre",Georgia,serif; font-size:21px; font-weight:500; margin:0}
+.sec-head .note{font-size:12.5px; color:var(--muted)}
+
+/* ---------- table ---------- */
+.tw{overflow-x:auto; border:1px solid var(--rule); border-radius:3px; background:var(--surface)}
+table{width:100%; border-collapse:collapse; font-size:14px}
+th,td{text-align:right; padding:9px 16px; white-space:nowrap}
+thead th{font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+  font-weight:500; border-bottom:1px solid var(--rule)}
+tbody tr+tr td{border-top:1px solid var(--rule)}
+tbody tr:first-child td{background:var(--sunken)}
+td.num{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+  direction:ltr; text-align:right}
+td.date{unicode-bidi:plaintext; text-align:right}
+td.day{color:var(--ink-2)}
+td.chg.up{color:var(--up)} td.chg.down{color:var(--down)} td.chg.flat{color:var(--muted)}
+
+/* ---------- chart ---------- */
+.chartcard{background:var(--surface); border:1px solid var(--rule); border-radius:3px; padding:14px 10px 6px}
+.toolbar{display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:space-between; padding:0 8px 10px}
+.seg{display:inline-flex; border:1px solid var(--rule-strong); border-radius:999px; overflow:hidden; background:var(--sunken)}
+.seg button{font-family:inherit; font-size:13px; padding:5px 14px; border:0; background:transparent;
+  color:var(--ink-2); cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--surface)}
+.seg button:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-size:13px; color:var(--ink-2)}
+.legend span{display:inline-flex; align-items:center; gap:7px}
+.key{width:16px; height:3px; border-radius:2px; display:inline-block}
+svg{display:block; width:100%; height:auto; touch-action:pan-y; direction:ltr}
+.tip{position:absolute; pointer-events:none; z-index:5; background:var(--surface);
+  border:1px solid var(--rule-strong); border-radius:3px; padding:8px 11px; font-size:13px;
+  box-shadow:var(--shadow); min-width:150px; opacity:0; transition:opacity .1s}
+.tip .t{font-size:12px; color:var(--muted); margin-bottom:5px}
+.tip .r{display:flex; justify-content:space-between; gap:16px; align-items:center}
+.tip .r b{font-family:"IBM Plex Mono",monospace; font-weight:500}
+.chartwrap{position:relative}
+
+/* ---------- notes ---------- */
+.notes{font-size:12.5px; color:var(--ink-2); background:var(--sunken); border:1px solid var(--rule);
+  border-radius:3px; padding:14px 18px; display:flex; flex-direction:column; gap:7px; line-height:1.6}
+.notes h3{margin:0 0 2px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:500}
+.notes a{color:var(--accent)}
+.notes code{font-family:"IBM Plex Mono",monospace; font-size:12px}
+footer{font-size:12px; color:var(--muted); text-align:center; padding-top:4px}
+
+@media (max-width:720px){
+  .today{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="head">
+    <div>
+      <h1>מחירון <span>PFAD</span></h1>
+      <p class="sub">Palm Fatty Acid Distillates · דולר לטון מטרי · FOB נמלי מלזיה. ציטוט הסגירה היומי מתוך דוח השוק של agropost.</p>
+    </div>
+    <div class="stamp">עודכן לאחרונה<b id="stamp">—</b></div>
+  </header>
+
+  <section class="today" id="today"></section>
+
+  <section class="stats" id="stats"></section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <h2>שבעת ימי המסחר האחרונים</h2>
+      <span class="note">שינוי מול יום המסחר הקודם</span>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>תאריך</th><th>יום</th><th>חודש קרוב</th><th>חודש עוקב</th><th>שינוי</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <h2>שלוש שנים של מחירים</h2>
+      <span class="note" id="chartnote"></span>
+    </div>
+    <div class="chartcard">
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="תצוגת גרף">
+          <button type="button" id="btn-season" aria-pressed="true">חפיפה עונתית</button>
+          <button type="button" id="btn-run" aria-pressed="false">רצף כרונולוגי</button>
+        </div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="chartwrap">
+        <svg id="chart" viewBox="0 0 1000 430" preserveAspectRatio="xMidYMid meet" role="img" aria-label="גרף מחירי PFAD"></svg>
+        <div class="tip" id="tip"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="notes">
+    <h3>על הנתונים</h3>
+    <p>המקור: <a href="https://agropost.wordpress.com/" target="_blank" rel="noopener">agropost</a> — טבלת <span dir="ltr">PHYSICAL MARKET PRICES FOR REFINED OILS &amp; FATS</span>, שורת <span dir="ltr">Palm Fatty Acid Distillates / Selling</span>. "חודש קרוב" הוא העמודה הראשונה בטבלה, "חודש עוקב" השנייה. אין פרסום בסופי שבוע ובחגי מלזיה.</p>
+    <p>נלקח ציטוט הסגירה (<span dir="ltr">at Closing</span>); בימים שבהם פורסם רק דוח אמצע היום נלקח <span dir="ltr">at Midday</span> — כ‑26 ימים מתוך <span id="npoints">—</span>.</p>
+    <p>שתי חריגות שמקורן בפרסום עצמו ולא בקריאה: ב‑29.6.2026 פורסם 1,172.5 לחודש הקרוב (למחרת 1,065), ובין 30.6.2026 ל‑17.7.2026 עמודת החודש העוקב נותרה סביב 1,175–1,185 בעוד החודש הקרוב נע סביב 1,065. הערכים מוצגים כפי שפורסמו.</p>
+  </section>
+
+  <footer>נתונים לשימוש פנימי. אינם ציטוט מסחרי מחייב.</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+
+
+function parseCSV(txt){
+  var out = [];
+  txt.trim().split("\n").forEach(function(line){
+    if(!line) return;
+    var p = line.split(",");
+    var m1 = parseFloat(p[1]);
+    if(isNaN(m1)) return;
+    var m2 = p[2] === "" || p[2] === undefined ? null : parseFloat(p[2]);
+    out.push({d:p[0], m1:m1, m2:(m2===null||isNaN(m2))?null:m2});
+  });
+  return out;
+}
+
+var rows = [], byDate = {};
+
+function rebuild(){
+  rows = Object.keys(byDate).sort().map(function(k){ return byDate[k]; });
+}
+
+/* ---------- helpers ---------- */
+var MONTHS = ["ינו","פבר","מרץ","אפר","מאי","יונ","יול","אוג","ספט","אוק","נוב","דצמ"];
+var DAYS = ["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","ש׳"];
+function fmt(n){
+  if(n===null||n===undefined) return "—";
+  return n.toLocaleString("en-US",{minimumFractionDigits:(n%1?1:0), maximumFractionDigits:1});
+}
+function toDate(s){ var p=s.split("-"); return new Date(Date.UTC(+p[0],+p[1]-1,+p[2])); }
+function heDate(s){ var p=s.split("-"); return +p[2]+" "+MONTHS[+p[1]-1]+" "+p[0]; }
+function shortDate(s){ var p=s.split("-"); return +p[2]+"."+ +p[1]; }
+function dayName(s){ return DAYS[toDate(s).getUTCDay()]; }
+function doy(s){
+  var d=toDate(s);
+  return Math.floor((d - Date.UTC(d.getUTCFullYear(),0,1))/864e5)+1;
+}
+function mean(a){ return a.length ? a.reduce(function(x,y){return x+y;},0)/a.length : null; }
+function windowAvg(days){
+  if(!rows.length) return {v:null,n:0};
+  var end = toDate(rows[rows.length-1].d);
+  var start = end - days*864e5;
+  var v = rows.filter(function(r){ return toDate(r.d) > start; }).map(function(r){ return r.m1; });
+  return {v: mean(v), n: v.length};
+}
+
+/* ---------- render: today ---------- */
+function renderTop(){
+  var last = rows[rows.length-1], prev = rows[rows.length-2];
+  var diff = prev ? last.m1 - prev.m1 : 0;
+  var cls = diff > 0 ? "up" : diff < 0 ? "down" : "flat";
+  var word = diff > 0 ? "עלייה" : diff < 0 ? "ירידה" : "ללא שינוי";
+  var arrow = diff > 0 ? "▲" : diff < 0 ? "▼" : "■";
+  var pct = prev ? (diff/prev.m1*100) : 0;
+
+  document.getElementById("stamp").textContent = heDate(last.d);
+  document.getElementById("npoints").textContent = rows.length + " ימים";
+
+  document.getElementById("today").innerHTML =
+    '<div class="q">' +
+      '<div class="lbl">חודש קרוב</div>' +
+      '<div class="per">ציטוט מכירה, ' + heDate(last.d) + '</div>' +
+      '<div class="val">' + fmt(last.m1) + ' <em>$/MT</em></div>' +
+      '<div class="delta ' + cls + '"><span class="arrow">' + arrow + '</span>' +
+        '<span>' + word + (diff ? " " + fmt(Math.abs(diff)) + " (" + (diff>0?"+":"−") + Math.abs(pct).toFixed(1) + "%)" : "") + '</span>' +
+        '<span class="since">מול ' + (prev ? heDate(prev.d) : "—") + '</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="q sec">' +
+      '<div class="lbl">חודש עוקב</div>' +
+      '<div class="per">' + (last.m2 !== null ? "העמודה השנייה בטבלה" : "לא צוטט ביום זה") + '</div>' +
+      '<div class="val">' + fmt(last.m2) + (last.m2!==null ? ' <em>$/MT</em>' : '') + '</div>' +
+      (last.m2 !== null
+        ? '<div class="delta flat"><span>פער מהחודש הקרוב: ' + fmt(last.m2 - last.m1) + ' דולר</span></div>'
+        : '<div class="delta flat"><span>בטבלה של אותו יום צוטט חודש אחד בלבד</span></div>') +
+    '</div>';
+
+  var a30 = windowAvg(30), a90 = windowAvg(90);
+  var yr = rows.filter(function(r){ return toDate(r.d) > toDate(rows[rows.length-1].d) - 365*864e5; }).map(function(r){ return r.m1; });
+  document.getElementById("stats").innerHTML =
+    tile("ממוצע 30 יום", a30.v, a30.n + " ציטוטים") +
+    tile("ממוצע 90 יום", a90.v, a90.n + " ציטוטים") +
+    '<div class="stat"><div class="lbl">טווח 12 חודשים</div><div class="v">' +
+      fmt(Math.min.apply(null,yr)) + '–' + fmt(Math.max.apply(null,yr)) +
+      '</div><div class="n">' + yr.length + ' ציטוטים</div></div>';
+}
+function tile(lbl,v,n){
+  return '<div class="stat"><div class="lbl">'+lbl+'</div><div class="v">'+
+    (v===null?"—":fmt(Math.round(v*10)/10))+'</div><div class="n">'+n+'</div></div>';
+}
+
+/* ---------- render: 7 days ---------- */
+function renderTable(){
+  var last7 = rows.slice(-7).reverse();
+  var html = "";
+  last7.forEach(function(r){
+    var i = rows.indexOf(r), prev = rows[i-1];
+    var diff = prev ? r.m1 - prev.m1 : null;
+    var cls = diff === null ? "flat" : diff > 0 ? "up" : diff < 0 ? "down" : "flat";
+    var txt = diff === null ? "—" : diff === 0 ? "0" : (diff > 0 ? "+" : "−") + fmt(Math.abs(diff));
+    html += '<tr><td class="num date">' + heDate(r.d) + '</td><td class="day">' + dayName(r.d) +
+      '</td><td class="num">' + fmt(r.m1) + '</td><td class="num">' + fmt(r.m2) +
+      '</td><td class="num chg ' + cls + '">' + txt + '</td></tr>';
+  });
+  document.getElementById("tbody").innerHTML = html;
+}
+
+/* ---------- chart ---------- */
+var YEARS = [2024, 2025, 2026];
+var COLORS = {2024:"--s2024", 2025:"--s2025", 2026:"--s2026"};
+var mode = "season";
+var SVGNS = "http://www.w3.org/2000/svg";
+var W = 1000, H = 430, PAD = {t:18, r:28, b:34, l:64};
+
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function el(name, attrs){
+  var n = document.createElementNS(SVGNS, name);
+  for(var k in attrs) n.setAttribute(k, attrs[k]);
+  return n;
+}
+function niceTicks(min, max, count){
+  var span = max - min, step = Math.pow(10, Math.floor(Math.log(span/count)/Math.LN10));
+  var err = span/count/step;
+  if(err >= 7.5) step *= 10; else if(err >= 3.5) step *= 5; else if(err >= 1.5) step *= 2;
+  var t = [], s = Math.ceil(min/step)*step;
+  for(var v = s; v <= max + 1e-9; v += step) t.push(Math.round(v*100)/100);
+  return t;
+}
+
+var hoverState = null;
+
+function draw(){
+  if(!rows.length) return;
+  var svg = document.getElementById("chart");
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+  var ink = css("--ink"), ink2 = css("--ink-2"), muted = css("--muted"),
+      grid = css("--rule"), axis = css("--rule-strong"), surface = css("--surface");
+
+  var series = [], xTicks = [], xLabel;
+
+  if(mode === "season"){
+    YEARS.forEach(function(y){
+      var pts = rows.filter(function(r){ return +r.d.slice(0,4) === y; })
+                    .map(function(r){ return {x:doy(r.d), y:r.m1, d:r.d}; });
+      if(pts.length) series.push({name:String(y), color:css(COLORS[y]), pts:pts});
+    });
+    for(var m = 0; m < 12; m++){
+      xTicks.push({x: doy("2025-" + String(m+1).padStart(2,"0") + "-01"), label: MONTHS[m]});
+    }
+    xLabel = function(x){ var m = 0; for(var i=0;i<12;i++){ if(x >= xTicks[i].x) m = i; } return MONTHS[m]; };
+  } else {
+    var pts = rows.map(function(r){ return {x: toDate(r.d)/864e5, y:r.m1, d:r.d}; });
+    series.push({name:"PFAD", color:css("--s2026"), pts:pts});
+    var seen = {};
+    rows.forEach(function(r){
+      var k = r.d.slice(0,7);
+      if(!seen[k] && (+r.d.slice(5,7) - 1) % 3 === 0){
+        seen[k] = 1;
+        xTicks.push({x: toDate(r.d.slice(0,7) + "-01")/864e5, label: MONTHS[+r.d.slice(5,7)-1] + " " + r.d.slice(2,4)});
+      }
+    });
+  }
+
+  var allY = [], allX = [];
+  series.forEach(function(s){ s.pts.forEach(function(p){ allY.push(p.y); allX.push(p.x); }); });
+  var yMin = Math.min.apply(null, allY), yMax = Math.max.apply(null, allY);
+  var padY = (yMax - yMin) * 0.12;
+  yMin -= padY; yMax += padY;
+  var xMin = mode === "season" ? 1 : Math.min.apply(null, allX);
+  var xMax = mode === "season" ? 366 : Math.max.apply(null, allX);
+
+  var X = function(v){ return PAD.l + (v - xMin) / (xMax - xMin) * (W - PAD.l - PAD.r); };
+  var Y = function(v){ return PAD.t + (1 - (v - yMin) / (yMax - yMin)) * (H - PAD.t - PAD.b); };
+
+  /* gridlines + y axis */
+  niceTicks(yMin, yMax, 5).forEach(function(v){
+    svg.appendChild(el("line",{x1:PAD.l, x2:W-PAD.r, y1:Y(v), y2:Y(v), stroke:grid, "stroke-width":1}));
+    var t = el("text",{x:PAD.l-10, y:Y(v)+4, fill:muted, "font-size":12, "text-anchor":"end",
+      "font-family":"'IBM Plex Mono', monospace"});
+    t.textContent = v.toLocaleString("en-US");
+    svg.appendChild(t);
+  });
+  svg.appendChild(el("line",{x1:PAD.l, x2:W-PAD.r, y1:H-PAD.b, y2:H-PAD.b, stroke:axis, "stroke-width":1}));
+
+  /* x ticks */
+  xTicks.forEach(function(t){
+    if(t.x < xMin || t.x > xMax) return;
+    var lab = el("text",{x:X(t.x), y:H-PAD.b+18, fill:muted, "font-size":12, "text-anchor":"middle"});
+    lab.textContent = t.label;
+    svg.appendChild(lab);
+  });
+
+  /* lines */
+  series.forEach(function(s){
+    var d = s.pts.map(function(p,i){ return (i?"L":"M") + X(p.x).toFixed(1) + " " + Y(p.y).toFixed(1); }).join(" ");
+    svg.appendChild(el("path",{d:d, fill:"none", stroke:s.color, "stroke-width":2,
+      "stroke-linejoin":"round", "stroke-linecap":"round"}));
+    var lastp = s.pts[s.pts.length-1];
+    svg.appendChild(el("circle",{cx:X(lastp.x), cy:Y(lastp.y), r:4.5, fill:s.color,
+      stroke:surface, "stroke-width":2}));
+    if(mode === "season" && s.name === String(YEARS[YEARS.length-1])){
+      var t = el("text",{x: X(lastp.x) + 10, y: Y(lastp.y) + 4, fill:ink2,
+        "font-size":13, "text-anchor":"start", "font-weight":500});
+      t.textContent = s.name;
+      svg.appendChild(t);
+    }
+  });
+
+  /* hover layer */
+  var focus = el("g",{opacity:0});
+  var vline = el("line",{y1:PAD.t, y2:H-PAD.b, stroke:axis, "stroke-width":1});
+  focus.appendChild(vline);
+  var dots = series.map(function(s){
+    var c = el("circle",{r:5, fill:s.color, stroke:surface, "stroke-width":2, opacity:0});
+    focus.appendChild(c); return c;
+  });
+  svg.appendChild(focus);
+
+  var hit = el("rect",{x:PAD.l, y:PAD.t, width:W-PAD.l-PAD.r, height:H-PAD.t-PAD.b,
+    fill:"transparent", style:"cursor:crosshair"});
+  svg.appendChild(hit);
+
+  var tip = document.getElementById("tip");
+  function move(ev){
+    var r = svg.getBoundingClientRect();
+    var cx = ev.clientX !== undefined ? ev.clientX : ev.touches[0].clientX;
+    var cy = ev.clientY !== undefined ? ev.clientY : ev.touches[0].clientY;
+    var xv = xMin + ((cx - r.left) / r.width * W - PAD.l) / (W - PAD.l - PAD.r) * (xMax - xMin);
+    var rowsOut = [], anchorY = null, anchorX = null;
+    series.forEach(function(s, i){
+      var best = null, bd = Infinity;
+      s.pts.forEach(function(p){ var dd = Math.abs(p.x - xv); if(dd < bd){ bd = dd; best = p; } });
+      var tol = mode === "season" ? 12 : 6;
+      if(best && bd <= tol){
+        dots[i].setAttribute("cx", X(best.x)); dots[i].setAttribute("cy", Y(best.y));
+        dots[i].setAttribute("opacity", 1);
+        rowsOut.push({name: s.name, color: s.color, v: best.y, d: best.d});
+        if(anchorY === null || Y(best.y) < anchorY){ anchorY = Y(best.y); }
+        anchorX = X(best.x);
+      } else { dots[i].setAttribute("opacity", 0); }
+    });
+    if(!rowsOut.length){ hide(); return; }
+    focus.setAttribute("opacity", 1);
+    vline.setAttribute("x1", anchorX); vline.setAttribute("x2", anchorX);
+    var pd = rowsOut[0].d.split("-");
+    var head = mode === "season" ? (+pd[2] + " " + MONTHS[+pd[1]-1] + " (בקירוב)") : heDate(rowsOut[0].d);
+    var html = '<div class="t">' + head + '</div>';
+    rowsOut.forEach(function(o){
+      html += '<div class="r"><span><span class="key" style="background:' + o.color +
+        '"></span> ' + (mode === "season" ? o.name : heDate(o.d)) + '</span><b>' + fmt(o.v) + '</b></div>';
+    });
+    tip.innerHTML = html;
+    tip.style.opacity = 1;
+    var wrapRect = svg.parentElement.getBoundingClientRect();
+    var px = cx - wrapRect.left, py = cy - wrapRect.top;
+    var tw = tip.offsetWidth, th = tip.offsetHeight;
+    tip.style.left = Math.max(4, Math.min(wrapRect.width - tw - 4, px - tw/2)) + "px";
+    tip.style.top = Math.max(4, py - th - 14) + "px";
+  }
+  function hide(){ focus.setAttribute("opacity", 0); tip.style.opacity = 0; }
+  hit.addEventListener("mousemove", move);
+  hit.addEventListener("mouseleave", hide);
+  hit.addEventListener("touchstart", move, {passive:true});
+  hit.addEventListener("touchmove", move, {passive:true});
+  hit.addEventListener("touchend", hide);
+
+  /* legend */
+  var lg = document.getElementById("legend");
+  lg.innerHTML = mode === "season"
+    ? series.map(function(s){
+        return '<span><span class="key" style="background:' + s.color + '"></span>' + s.name + '</span>';
+      }).join("")
+    : '<span><span class="key" style="background:' + css("--s2026") + '"></span>חודש קרוב, ' +
+      heDate(rows[0].d) + ' עד ' + heDate(rows[rows.length-1].d) + '</span>';
+
+  document.getElementById("chartnote").textContent = mode === "season"
+    ? "מחיר החודש הקרוב, כל שנה בקו נפרד, לפי יום בשנה"
+    : "מחיר החודש הקרוב לאורך כל התקופה";
+}
+
+/* ---------- toggle ---------- */
+function setMode(m){
+  mode = m;
+  document.getElementById("btn-season").setAttribute("aria-pressed", m === "season");
+  document.getElementById("btn-run").setAttribute("aria-pressed", m === "run");
+  draw();
+}
+document.getElementById("btn-season").addEventListener("click", function(){ setMode("season"); });
+document.getElementById("btn-run").addEventListener("click", function(){ setMode("run"); });
+
+/* ---------- boot ---------- */
+function renderAll(){ rebuild(); renderTop(); renderTable(); draw(); }
+
+fetch("data.csv?v=" + Date.now())
+  .then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+  .then(function(txt){
+    rows = parseCSV(txt);
+    byDate = {};
+    rows.forEach(function(r){ byDate[r.d] = r; });
+    if(!rows.length) throw new Error("empty");
+    renderAll();
+  })
+  .catch(function(){
+    document.getElementById("today").innerHTML =
+      '<div class="q"><div class="lbl">שגיאה</div>' +
+      '<div class="per">לא הצלחתי לטעון את data.csv. רענן את הדף; אם זה חוזר, בדוק שהקובץ קיים במאגר.</div></div>';
+  });
+
+var mq = window.matchMedia("(prefers-color-scheme: dark)");
+if(mq.addEventListener) mq.addEventListener("change", draw);
+new MutationObserver(draw).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+
+})();
+</script>
+
+</body>
+</html>
